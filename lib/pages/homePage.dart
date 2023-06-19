@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'package:location/location.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,12 +13,67 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Map myMessages = {};
-  static const _initialCameraPosition = CameraPosition(target: LatLng(37.77, -122.43), zoom: 11.5);
+
+  static var _initialCameraPosition;
+  static var myLocation;
+  Location location = new Location();
+  PermissionStatus? _permissionGranted;
+  static const double ZOOM=18.5;
+  String _mapStyle = '';
+
   final Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
 
+  Future<LocationData> getCurrentLocation() async {
+    checkLocationService();
+    rootBundle.loadString('assets/map_style.txt').then((string) {
+    _mapStyle = string;
+  });
+    myLocation = await location.getLocation();
+    print("TEST" + myLocation.toString());
+
+    _initialCameraPosition =
+        LatLng(myLocation.latitude!, myLocation.longitude!);
+
+    if (myLocation == null) {
+      myLocation =
+          LocationData.fromMap({"latitude": 52.13, "longitude": 21.00});
+    }
+    return myLocation;
+  }
+
+  void checkLocationService() async {
+    bool _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    print("TEST - permissiona & service OK");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //checkLocationService();
+    //await getCurrentLocation();
+  }
+
   @override
   Widget build(BuildContext context) {
+    //await getCurrentLocation();
+
+    print("BUILD");
+
     return Scaffold(
       appBar: AppBar(
           title: Row(children: const [
@@ -42,13 +99,31 @@ class _HomePageState extends State<HomePage> {
         children: [
           Flexible(
               flex: 9,
-              child: GoogleMap(
-      initialCameraPosition: _initialCameraPosition,
-      myLocationButtonEnabled: false,
-      zoomControlsEnabled: false,
-      onMapCreated: (GoogleMapController controller) {
-          _googleMapController.complete(controller);
-        },)),
+              child: FutureBuilder<LocationData>(
+                  future: getCurrentLocation(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<LocationData> snapshot) {
+                    if (!snapshot.hasData) {
+                      // while data is loading:
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      // data loaded:
+
+                      return GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                              target: LatLng(_initialCameraPosition.latitude,
+                                  _initialCameraPosition.longitude),
+                              zoom: ZOOM),
+                          myLocationEnabled: true,
+                          zoomControlsEnabled: false,
+                          onMapCreated: (GoogleMapController controller) {
+                            _googleMapController.complete(controller);
+                            controller.setMapStyle(_mapStyle);
+                          });
+                    }
+                  })),
           Flexible(
               flex: 1,
               child: Container(
