@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   static var myLocation;
   Location location = new Location();
   PermissionStatus? _permissionGranted;
-  static const double ZOOM=18.5;
+  static const double ZOOM = 18.5;
   String _mapStyle = '';
 
   final Completer<GoogleMapController> _googleMapController =
@@ -27,8 +27,8 @@ class _HomePageState extends State<HomePage> {
   Future<LocationData> getCurrentLocation() async {
     checkLocationService();
     rootBundle.loadString('assets/map_style.txt').then((string) {
-    _mapStyle = string;
-  });
+      _mapStyle = string;
+    });
     myLocation = await location.getLocation();
     print("TEST" + myLocation.toString());
 
