@@ -3,6 +3,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'dart:math';
+import 'package:geolocator/geolocator.dart';
+import 'package:postspot_mobile_app/data/message.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,23 +18,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Map myMessages = {};
+  
+  Map messages = {};
 
   static var _initialCameraPosition;
   static var myLocation;
-  Location location = new Location();
+  var location = new Location();
   PermissionStatus? _permissionGranted;
   static const double ZOOM = 18.5;
   String _mapStyle = '';
+  Set<Marker> _markers = Set<Marker>();
+  var messageIcon;
+  var messageOpenIcon;
 
   final Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
 
-  Future<LocationData> getCurrentLocation() async {
+  Future<LocationData> getInitLocation() async {
     checkLocationService();
-    rootBundle.loadString('assets/map_style.txt').then((string) {
-      _mapStyle = string;
-    });
+    
     myLocation = await location.getLocation();
     print("TEST" + myLocation.toString());
 
@@ -61,11 +69,171 @@ class _HomePageState extends State<HomePage> {
     print("TEST - permissiona & service OK");
   }
 
+   Future<LocationData> getCurrentLocation() async {
+    Location location = Location();location.getLocation().then(
+      (location) {
+        myLocation = location;
+      },
+    );
+    GoogleMapController googleMapController = await _googleMapController.future;
+    location.onLocationChanged.listen(
+      (newLoc) {
+        myLocation = newLoc;googleMapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              zoom: ZOOM,
+              target: LatLng(
+                newLoc.latitude!,
+                newLoc.longitude!,
+              ),
+            ),
+          ),
+        );
+        setState(() {});
+      },
+    );
+    return myLocation;
+  }
+
+  void updatePinOnMap(GoogleMapController controller) async {
+   
+   // create a new CameraPosition instance
+   // every time the location changes, so the camera
+   // follows the pin as it moves with an animation  
+    CameraPosition cPosition = CameraPosition(
+   zoom: ZOOM,
+   target: LatLng(myLocation.latitude,
+      myLocation.longitude),
+   );
+controller.animateCamera(CameraUpdate.newCameraPosition(cPosition)); 
+
+  // do this inside the setState() so Flutter gets notified
+   // that a widget update is due
+    setState(() {      // updated position
+      var pinPosition = LatLng(myLocation.latitude,
+      myLocation.longitude);
+      
+      // the trick is to remove the marker (by id)
+      // and add it again at the updated location
+    });
+}
+
+void showPinsOnMap() {   // get a LatLng for the source location
+   // from the LocationData currentLocation object
+  
+  setInitMarkersPostsTEST();
+    // destination pin
+     // set the route lines on the map from source to destination
+   // for more info follow this tutorial
+}
+
+void setInitMarkersPostsTEST() async{
+  var mess1 = LatLng(52.2606860, 20.9329840);   
+  var mess2 = LatLng(52.2610000, 20.9327200);
+  var mess3 = LatLng(52.2606360, 20.9326040);// add the initial source location pin
+
+  var buttonSize = Size(48, 48); // Dostosuj rozmiar przycisku do swoich potrzeb
+
+   _markers.add(Marker(
+      markerId: MarkerId('message1'),
+      position: mess1,
+      icon: BitmapDescriptor.fromBytes(messageIcon),
+      consumeTapEvents: true,
+    onTap: () {
+      // Kod obsługi naciśnięcia przycisku dla tego markera
+      var distance = calculateDistance(myLocation.latitude, myLocation.longitude, mess1.latitude, mess1.longitude);
+      print("TEST DISTANCE: "+ distance.toString());
+      if(distance < 10){
+        print("OPEN MESSAGE");
+      }
+    }
+   )); 
+   _markers.add(Marker(
+      markerId: MarkerId('message2'),
+      position: mess2, 
+      icon: BitmapDescriptor.fromBytes(messageOpenIcon),
+      consumeTapEvents: true,
+       onTap: () {
+      // Kod obsługi naciśnięcia przycisku dla tego markera
+      var distance = calculateDistance(myLocation.latitude, myLocation.longitude, mess1.latitude, mess1.longitude);
+      print("TEST DISTANCE: "+ distance.toString());
+      if(distance < 10){
+        print("OPEN MESSAGE");
+      }
+    }
+   ));  
+   _markers.add(Marker(
+      markerId: MarkerId('message3'),
+      position: mess3,  
+      icon: BitmapDescriptor.fromBytes(messageIcon),
+      consumeTapEvents: true,
+       onTap: () {
+      // Kod obsługi naciśnięcia przycisku dla tego markera
+      var distance = calculateDistance(myLocation.latitude, myLocation.longitude, mess1.latitude, mess1.longitude);
+      print("TEST DISTANCE: "+ distance.toString());
+      if(distance < 10){
+        print("OPEN MESSAGE");
+      }
+})); 
+}
+
+void setMarkersIcon() async{
+      messageIcon = await getBytesFromAsset('assets/env1.png', 100);
+      messageOpenIcon = await getBytesFromAsset('assets/env2.png', 100);
+}
+
+
+Future<Uint8List> getBytesFromAsset(String path, int width) async {
+  ByteData data = await rootBundle.load(path);
+  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+  ui.FrameInfo fi = await codec.getNextFrame();
+  return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+}
+
+// double calculateDistance(double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
+//   const int earthRadius = 6371000; // Przybliżony promień Ziemi w metrach
+//   double lat1Rad = startLatitude * (pi / 180);
+//   double lon1Rad = startLongitude * (pi / 180);
+//   double lat2Rad = endLatitude * (pi / 180);
+//   double lon2Rad = endLongitude * (pi / 180);
+//   double dlat = lat2Rad - lat1Rad;
+//   double dlon = lon2Rad - lon1Rad;
+//   double a = sin(dlat / 2) * sin(dlat / 2) + cos(lat1Rad) * cos(lat2Rad) * sin(dlon / 2) * sin(dlon / 2);
+//   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+//   double distance = earthRadius * c;
+//   return distance;
+// }
+// double calculateDistance(double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
+//   double dx = endLongitude - startLongitude;
+//   double dy = endLatitude - startLatitude;
+//   double distance = sqrt(dx * dx + dy * dy);
+//   return distance;
+// }
+
+double calculateDistance(double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
+  double distanceInMeters = Geolocator.distanceBetween(
+    startLatitude, startLongitude, endLatitude, endLongitude);
+
+  return distanceInMeters;
+}
+
   @override
   void initState() {
     super.initState();
+    rootBundle.loadString('assets/map_style.txt').then((string) {
+      _mapStyle = string;
+    });
+    setMarkersIcon();
+
+    location.onLocationChanged.listen((LocationData cLoc) {
+      // cLoc contains the lat and long of the
+      // current user's position in real time,
+      // so we're holding on to it
+      myLocation = cLoc;
+      
+   });
     //checkLocationService();
-    //await getCurrentLocation();
+    getCurrentLocation();
   }
 
   @override
@@ -99,10 +267,10 @@ class _HomePageState extends State<HomePage> {
         children: [
           Flexible(
               flex: 9,
-              child: FutureBuilder<LocationData>(
-                  future: getCurrentLocation(),
+              child: FutureBuilder<void>(
+                  future: getInitLocation(),
                   builder: (BuildContext context,
-                      AsyncSnapshot<LocationData> snapshot) {
+                      AsyncSnapshot<void> snapshot) {
                     if (!snapshot.hasData) {
                       // while data is loading:
                       return Center(
@@ -117,10 +285,19 @@ class _HomePageState extends State<HomePage> {
                                   _initialCameraPosition.longitude),
                               zoom: ZOOM),
                           myLocationEnabled: true,
+                          scrollGesturesEnabled: false,
                           zoomControlsEnabled: false,
+                          tiltGesturesEnabled: false,
+                          rotateGesturesEnabled: false,
+                          zoomGesturesEnabled: false,
+                          liteModeEnabled: false,
+                          myLocationButtonEnabled: true,
+                          markers: _markers,
                           onMapCreated: (GoogleMapController controller) {
                             _googleMapController.complete(controller);
                             controller.setMapStyle(_mapStyle);
+                            updatePinOnMap(controller);
+                            showPinsOnMap();
                           });
                     }
                   })),
@@ -139,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                             dynamic result = await Navigator.pushNamed(
                                 context, '/createPost');
                             setState(() {
-                              myMessages[result['messageId']] = {
+                              messages[result['id']] = {
                                 'title': result['title'],
                                 'message': result['message']
                               };
