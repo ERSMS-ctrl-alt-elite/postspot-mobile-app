@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "932746634099",
+    "project_id": "postspot-prod",
+    "storage_bucket": "postspot-prod.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932746634099:android:a55fc1298a253271f31b06",
+        "android_client_info": {
+          "package_name": "com.example.postspot_mobile_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "932746634099-bb94m03rt06tjbvlic77v642n8ffepht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.postspot_mobile_app",
+            "certificate_hash": "996acc6d9e2f2e96032540bf5f76756d23ec9399"
+          }
+        },
+        {
+          "client_id": "932746634099-5ec862g7v2gpa1cp1kanap294lbip5ke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7ifA7d4xpFbzSvqT8hLZXQzgUuRJmbxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "932746634099-5ec862g7v2gpa1cp1kanap294lbip5ke.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

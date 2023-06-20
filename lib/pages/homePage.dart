@@ -9,6 +9,8 @@ import 'dart:typed_data';
 import 'dart:math';
 import 'package:geolocator/geolocator.dart';
 import 'package:postspot_mobile_app/data/message.dart';
+import 'package:postspot_mobile_app/services/authService.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -244,6 +246,7 @@ double calculateDistance(double startLatitude, double startLongitude, double end
 
     return Scaffold(
       appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Row(children: const [
             Icon(Icons.edit_location_alt_outlined),
             Text('PostSpot',
@@ -256,7 +259,10 @@ double calculateDistance(double startLatitude, double startLongitude, double end
           backgroundColor: const Color.fromARGB(255, 64, 100, 133),
           actions: <Widget>[
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                AuthService().signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
               icon: const Icon(Icons.account_circle_sharp),
               color: Colors.white,
               iconSize: 40.0,

@@ -37,6 +37,9 @@ dependencies:
   location: ^4.2.0
   flutter_svg: 
   geolocator: ^7.0.3
+  google_sign_in: ^6.1.4
+  firebase_auth: ^4.6.3
+  firebase_core: ^2.14.0
 
   
 
