@@ -11,7 +11,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:postspot_mobile_app/data/message.dart';
 import 'package:postspot_mobile_app/services/authService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:postspot_mobile_app/services/postRestClient.dart';
+import 'package:postspot_mobile_app/data/post.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,8 +22,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
-  Map messages = {};
+  List<Post> posts = List.empty(growable: true);
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   static var _initialCameraPosition;
   static var myLocation;
@@ -39,9 +40,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<LocationData> getInitLocation() async {
     checkLocationService();
-    
+
     myLocation = await location.getLocation();
-    print("TEST" + myLocation.toString());
+    print("TEST " + myLocation.toString());
 
     _initialCameraPosition =
         LatLng(myLocation.latitude!, myLocation.longitude!);
@@ -50,6 +51,8 @@ class _HomePageState extends State<HomePage> {
       myLocation =
           LocationData.fromMap({"latitude": 52.13, "longitude": 21.00});
     }
+
+    
     return myLocation;
   }
 
@@ -70,10 +73,14 @@ class _HomePageState extends State<HomePage> {
       }
     }
     print("TEST - permissiona & service OK");
+
+    // POBIERANIE POSTÓW - DZIAŁA W PĘTLI UWAGA!!!
+    // posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
   }
 
-   Future<LocationData> getCurrentLocation() async {
-    Location location = Location();location.getLocation().then(
+  Future<LocationData> getCurrentLocation() async {
+    Location location = Location();
+    location.getLocation().then(
       (location) {
         myLocation = location;
       },
@@ -81,7 +88,8 @@ class _HomePageState extends State<HomePage> {
     GoogleMapController googleMapController = await _googleMapController.future;
     location.onLocationChanged.listen(
       (newLoc) {
-        myLocation = newLoc;googleMapController.animateCamera(
+        myLocation = newLoc;
+        googleMapController.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(
               zoom: ZOOM,
@@ -99,99 +107,169 @@ class _HomePageState extends State<HomePage> {
   }
 
   void updatePinOnMap(GoogleMapController controller) async {
-   
-   // create a new CameraPosition instance
-   // every time the location changes, so the camera
-   // follows the pin as it moves with an animation  
+    // create a new CameraPosition instance
+    // every time the location changes, so the camera
+    // follows the pin as it moves with an animation
     CameraPosition cPosition = CameraPosition(
-   zoom: ZOOM,
-   target: LatLng(myLocation.latitude,
-      myLocation.longitude),
-   );
-controller.animateCamera(CameraUpdate.newCameraPosition(cPosition)); 
+      zoom: ZOOM,
+      target: LatLng(myLocation.latitude, myLocation.longitude),
+    );
+    controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
 
-  // do this inside the setState() so Flutter gets notified
-   // that a widget update is due
-    setState(() {      // updated position
-      var pinPosition = LatLng(myLocation.latitude,
-      myLocation.longitude);
+    // do this inside the setState() so Flutter gets notified
+    // that a widget update is due
+    setState(() {
+      // updated position
+      var pinPosition = LatLng(myLocation.latitude, myLocation.longitude);
       
       // the trick is to remove the marker (by id)
       // and add it again at the updated location
     });
-}
+  }
 
-void showPinsOnMap() {   // get a LatLng for the source location
-   // from the LocationData currentLocation object
-  
-  setInitMarkersPostsTEST();
+  void showPinsOnMap() {
+    // get a LatLng for the source location
+    // from the LocationData currentLocation object
+   
+
+    //setInitMarkersPostsTEST();
     // destination pin
-     // set the route lines on the map from source to destination
-   // for more info follow this tutorial
-}
+    // set the route lines on the map from source to destination
+    // for more info follow this tutorial
+  }
 
-void setInitMarkersPostsTEST() async{
-  var mess1 = LatLng(52.2606860, 20.9329840);   
-  var mess2 = LatLng(52.2610000, 20.9327200);
-  var mess3 = LatLng(52.2606360, 20.9326040);// add the initial source location pin
+  
 
-  var buttonSize = Size(48, 48); // Dostosuj rozmiar przycisku do swoich potrzeb
+  void setInitMarkersPostsTEST() async {
+    var mess1 = LatLng(52.2606860, 20.9329840);
+    var mess2 = LatLng(52.2610000, 20.9327200);
+    var mess3 =
+        LatLng(52.2606360, 20.9326040); // add the initial source location pin
 
-   _markers.add(Marker(
-      markerId: MarkerId('message1'),
-      position: mess1,
-      icon: BitmapDescriptor.fromBytes(messageIcon),
-      consumeTapEvents: true,
-    onTap: () {
-      // Kod obsługi naciśnięcia przycisku dla tego markera
-      var distance = calculateDistance(myLocation.latitude, myLocation.longitude, mess1.latitude, mess1.longitude);
-      print("TEST DISTANCE: "+ distance.toString());
-      if(distance < 10){
-        print("OPEN MESSAGE");
-      }
+    _markers.add(Marker(
+        markerId: MarkerId('message1'),
+        position: mess1,
+        icon: BitmapDescriptor.fromBytes(messageIcon),
+        consumeTapEvents: true,
+        onTap: () {
+          // Kod obsługi naciśnięcia przycisku dla tego markera
+          var distance = calculateDistance(myLocation.latitude,
+              myLocation.longitude, mess1.latitude, mess1.longitude);
+          print("TEST DISTANCE: " + distance.toString());
+          if (distance < 10) {
+            print("OPEN MESSAGE");
+          }
+        }));
+    _markers.add(Marker(
+        markerId: MarkerId('message2'),
+        position: mess2,
+        icon: BitmapDescriptor.fromBytes(messageOpenIcon),
+        consumeTapEvents: true,
+        onTap: () {
+          // Kod obsługi naciśnięcia przycisku dla tego markera
+          var distance = calculateDistance(myLocation.latitude,
+              myLocation.longitude, mess1.latitude, mess1.longitude);
+          print("TEST DISTANCE: " + distance.toString());
+          if (distance < 10) {
+            print("OPEN MESSAGE");
+          }
+        }));
+    _markers.add(Marker(
+        markerId: MarkerId('message3'),
+        position: mess3,
+        icon: BitmapDescriptor.fromBytes(messageIcon),
+        consumeTapEvents: true,
+        onTap: () {
+          // Kod obsługi naciśnięcia przycisku dla tego markera
+          var distance = calculateDistance(myLocation.latitude,
+              myLocation.longitude, mess1.latitude, mess1.longitude);
+              print("TEST DISTANCE: " + distance.toString());
+          if (distance < 10) {
+              print("OPEN MESSAGE");
+          }
+        }));
+  }
+
+  void createMarkers(GoogleMapController controller) {
+    if (_markers.isNotEmpty) _markers.clear();
+
+    for (var i = 0; i < posts.length; i++) {
+      var p = posts[i];
+      var distance = calculateDistance(
+          myLocation.latitude, myLocation.longitude, p.latitude, p.longtitude);
+
+      final marker = Marker(
+          markerId: MarkerId(p.post_id),
+          position: LatLng(p.latitude, p.longtitude),
+          icon: BitmapDescriptor.fromBytes(
+              distance < 10 ? messageOpenIcon : messageIcon),
+          consumeTapEvents: true,
+          onTap: () {
+            // Kod obsługi naciśnięcia przycisku dla tego markera
+            if (distance < 10) {
+              print("TEST DISTANCE: " + distance.toString());
+              print("OPEN MESSAGE");
+              print(MarkerId(p.post_id).value);
+
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: Stack(
+                      //overflow: Overflow.visible,
+                      children: <Widget>[
+                        Positioned(
+                          right: -40.0,
+                          top: -40.0,
+                          child: InkResponse(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: CircleAvatar(
+                              radius: 12,
+                      child: Icon(Icons.close, size: 18,),
+                      backgroundColor: Colors.red,
+                            ),
+                          ),
+                        ),
+                        
+                      ],
+                    ),
+                  );
+                });
+          
+            }
+          });
+     setState(() {
+       
+      markers[MarkerId(p.post_id)] = marker;
+     }); 
     }
-   )); 
-   _markers.add(Marker(
-      markerId: MarkerId('message2'),
-      position: mess2, 
-      icon: BitmapDescriptor.fromBytes(messageOpenIcon),
-      consumeTapEvents: true,
-       onTap: () {
-      // Kod obsługi naciśnięcia przycisku dla tego markera
-      var distance = calculateDistance(myLocation.latitude, myLocation.longitude, mess1.latitude, mess1.longitude);
-      print("TEST DISTANCE: "+ distance.toString());
-      if(distance < 10){
-        print("OPEN MESSAGE");
-      }
-    }
-   ));  
-   _markers.add(Marker(
-      markerId: MarkerId('message3'),
-      position: mess3,  
-      icon: BitmapDescriptor.fromBytes(messageIcon),
-      consumeTapEvents: true,
-       onTap: () {
-      // Kod obsługi naciśnięcia przycisku dla tego markera
-      var distance = calculateDistance(myLocation.latitude, myLocation.longitude, mess1.latitude, mess1.longitude);
-      print("TEST DISTANCE: "+ distance.toString());
-      if(distance < 10){
-        print("OPEN MESSAGE");
-      }
-})); 
-}
+  }
 
-void setMarkersIcon() async{
-      messageIcon = await getBytesFromAsset('assets/env1.png', 100);
-      messageOpenIcon = await getBytesFromAsset('assets/env2.png', 100);
-}
+  void initPostsTEST() {
+    posts.add(
+        Post('1', 'google1', 'Title1', 'message1', 20.9329840, 52.2606860));
+    posts.add(
+        Post('2', 'google2', 'Title2', 'message2', 20.9327200, 52.2610000));
+    posts.add(
+        Post('3', 'google3', 'Title3', 'message3', 20.9326040, 52.2606360));
+  }
 
+  void setMarkersIcon() async {
+    messageIcon = await getBytesFromAsset('assets/env1.png', 100);
+    messageOpenIcon = await getBytesFromAsset('assets/env2.png', 100);
+  }
 
-Future<Uint8List> getBytesFromAsset(String path, int width) async {
-  ByteData data = await rootBundle.load(path);
-  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
-  ui.FrameInfo fi = await codec.getNextFrame();
-  return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
-}
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
 
 // double calculateDistance(double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
 //   const int earthRadius = 6371000; // Przybliżony promień Ziemi w metrach
@@ -213,12 +291,13 @@ Future<Uint8List> getBytesFromAsset(String path, int width) async {
 //   return distance;
 // }
 
-double calculateDistance(double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
-  double distanceInMeters = Geolocator.distanceBetween(
-    startLatitude, startLongitude, endLatitude, endLongitude);
+  double calculateDistance(double startLatitude, double startLongitude,
+      double endLatitude, double endLongitude) {
+    double distanceInMeters = Geolocator.distanceBetween(
+        startLatitude, startLongitude, endLatitude, endLongitude);
 
-  return distanceInMeters;
-}
+    return distanceInMeters;
+  }
 
   @override
   void initState() {
@@ -227,16 +306,17 @@ double calculateDistance(double startLatitude, double startLongitude, double end
       _mapStyle = string;
     });
     setMarkersIcon();
-
+    
     location.onLocationChanged.listen((LocationData cLoc) {
       // cLoc contains the lat and long of the
       // current user's position in real time,
       // so we're holding on to it
       myLocation = cLoc;
-      
-   });
+    });
     //checkLocationService();
     getCurrentLocation();
+    initPostsTEST();
+    print("INIT");
   }
 
   @override
@@ -276,8 +356,8 @@ double calculateDistance(double startLatitude, double startLongitude, double end
               flex: 9,
               child: FutureBuilder<void>(
                   future: getInitLocation(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<void> snapshot) {
+                  builder:
+                      (BuildContext context, AsyncSnapshot<void> snapshot) {
                     if (!snapshot.hasData) {
                       // while data is loading:
                       return Center(
@@ -299,12 +379,12 @@ double calculateDistance(double startLatitude, double startLongitude, double end
                           zoomGesturesEnabled: false,
                           liteModeEnabled: false,
                           myLocationButtonEnabled: true,
-                          markers: _markers,
+                          markers: markers.values.toSet(),
                           onMapCreated: (GoogleMapController controller) {
                             _googleMapController.complete(controller);
                             controller.setMapStyle(_mapStyle);
                             updatePinOnMap(controller);
-                            showPinsOnMap();
+                            createMarkers(controller);
                           });
                     }
                   })),
@@ -323,10 +403,10 @@ double calculateDistance(double startLatitude, double startLongitude, double end
                             dynamic result = await Navigator.pushNamed(
                                 context, '/createPost');
                             setState(() {
-                              messages[result['id']] = {
-                                'title': result['title'],
-                                'message': result['message']
-                              };
+                              //po[result['id']] = {
+                              //  'title': result['title'],
+                              //  'message': result['message']
+                              //};
                             });
                           },
                           icon: const Icon(Icons.add_comment),

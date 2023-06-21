@@ -1,21 +1,19 @@
 class Post {
-  String id = '';
-  DateTime dateTime;
+  String post_id = '';
   String title = '';
-  String message = '';
-  String user = '';
+  String content = '';
+  String author_google_id = '';
   double longtitude = 0.0;
   double latitude = 0.0;
 
-  Post(this.id, this.dateTime, this.title, this.message, this.user,
+  Post(this.post_id, this.author_google_id, this.title, this.content,
       this.longtitude, this.latitude);
 
   Map toJson() => {
-        'id': id,
-        'dateTime': dateTime,
+        'post_id': post_id,
+        'author_google_id': author_google_id,
         'title': title,
-        'message': message,
-        'user': user,
+        'content': content,
         'longtitude': longtitude,
         'latitude': latitude,
       };

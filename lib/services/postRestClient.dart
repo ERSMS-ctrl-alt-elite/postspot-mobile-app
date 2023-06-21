@@ -1,57 +1,69 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../data/post.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class PostRestService {
-  Post? post;
-  var lat;
-  var lang;
-
   var token;
   var client = http.Client();
-  
-  var hostName = "postspot-api-gateway-eu-dev-v1-0-8-a5mqnrt6.nw.gateway.dev";
-  var endpoint = "/v1/posts";
-  Map<String,String> getQueryParameters = {};
 
-  PostRestService(post, lat, lang){
-    this.post = post;
-    this.lat = lat;
-    this.lang = lang;
-    this.token = FirebaseAuth.instance.currentUser!.refreshToken;
-    getQueryParameters['lat'] = lat;
-    getQueryParameters['lang'] = lang;
+  var hostName = "post-service-dev-svdlq5xita-lm.a.run.app";
+  var endpoint = "/posts";
+  Map<String, String> getQueryParameters = {};
+
+  PostRestService() {
+    token = FirebaseAuth.instance.currentUser!.refreshToken;
   }
 
-  Future<void> createPost() async {
-    final jsonData = post!.toJson();
+  Future<void> createPost(Post post) async {
+    final jsonData = post.toJson();
     try {
-      var response = await client.post(
-        Uri.https(hostName,endpoint),
-        headers:{
-          'Authorization': 'Bearer $token'
-        }, 
-         body: jsonData);
+      await client.post(Uri.https(hostName, endpoint),
+          headers: {'Authorization': 'Bearer $token'}, body: jsonData);
     } finally {
       client.close();
     }
   }
 
-  Future<void> getPosts() async {
+  Future<List<Post>> getPosts(lat, lang) async {
+    print("START GET POSTS");
+    List<Post> posts = List.empty(growable: true);
+    getQueryParameters['lat'] = lat.toString();
+    getQueryParameters['lang'] = lang.toString();
     try {
+      print("TRY GET POSTS");
       var response = await client.get(
-        Uri.https(hostName,endpoint,getQueryParameters),
-        headers:{
-          'Authorization': 'Bearer $token'
-        });
-    }
-     finally {
+          Uri.https(hostName, endpoint, getQueryParameters),
+          headers: {'Authorization': 'Bearer $token'});
+      print(response.body.toString());
+      var decodedResponse = jsonDecode(response.body) as Map;
+      print(decodedResponse);
+      List plist = decodedResponse['posts'];
+
+      for (var i = 0; i < plist.length; i++) {
+        Map p = plist[i];
+        posts.add(Post(p['post_id'], p['author_google_id'], p['title'],
+            p['content'], p['longtitude'], p['latitude']));
+      }
+    } finally {
       client.close();
     }
-    
+    print("END GET POSTS");
+    return posts;
   }
 
+  Future<Post> getPost(String id) async {
+    Post post;
+    try {
+      var response = await client.get(Uri.https(hostName, endpoint + id),
+          headers: {'Authorization': 'Bearer $token'});
+
+      var p = jsonDecode(response.body) as Map;
+      post = Post(p['post_id'], p['author_google_id'], p['title'], p['content'],
+          p['longtitude'], p['latitude']);
+    } finally {
+      client.close();
+    }
+    return post;
+  }
 }
-
-
