@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
 
   static var _initialCameraPosition;
   static var myLocation;
-  static var myRelativeLocation;
+  static LocationData myRelativeLocation = LocationData.fromMap({"latitude": 0.0, "longitude": 0.0});
   var location = new Location();
   PermissionStatus? _permissionGranted;
   static const double ZOOM = 18.5;
@@ -76,7 +76,10 @@ class _HomePageState extends State<HomePage> {
     print("TEST - permissiona & service OK");
 
     // POBIERANIE POSTÓW - DZIAŁA W PĘTLI UWAGA!!!
-    // posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
+    //posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
+    if(checkRelativeLocation()){
+      downloadClosePosts();
+    }
   }
 
   Future<LocationData> getCurrentLocation() async {
@@ -108,8 +111,11 @@ class _HomePageState extends State<HomePage> {
     return myLocation;
   }
 
+
   bool checkRelativeLocation(){
-    if((myLocation - myRelativeLocation).abs() > 10){
+    if((myLocation.latitude - myRelativeLocation.latitude).abs() > 10.0 ||
+        (myRelativeLocation.longitude! - myRelativeLocation.longitude!).abs() > 10.0){
+      myRelativeLocation = myLocation;
       return true;
     }
     else {
@@ -117,9 +123,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void downloadClosePosts() async{
+  void downloadClosePosts() {
     print("DOWNLOAD POSTS");
-    posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longtitude);
+    setState(() async{   
+      posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
+      createMarkers();
+     });
   }
 
   void updatePinOnMap(GoogleMapController controller) async {
@@ -134,10 +143,10 @@ class _HomePageState extends State<HomePage> {
 
     // do this inside the setState() so Flutter gets notified
     // that a widget update is due
-    setState(() {
+    setState((){
       // updated position
       var pinPosition = LatLng(myLocation.latitude, myLocation.longitude);
-      
+
       // the trick is to remove the marker (by id)
       // and add it again at the updated location
     });
@@ -206,7 +215,7 @@ class _HomePageState extends State<HomePage> {
         }));
   }
 
-  void createMarkers(GoogleMapController controller) {
+  void createMarkers() {
     if (_markers.isNotEmpty) _markers.clear();
 
     for (var i = 0; i < posts.length; i++) {
@@ -256,11 +265,11 @@ class _HomePageState extends State<HomePage> {
           
             }
           });
-     setState(() {
-       
+     setState(() {   
       markers[MarkerId(p.post_id)] = marker;
      }); 
     }
+    print("CREATE MARKERS");
   }
 
   void initPostsTEST() {
@@ -331,7 +340,8 @@ class _HomePageState extends State<HomePage> {
     });
     //checkLocationService();
     getCurrentLocation();
-    initPostsTEST();
+    //initPostsTEST();
+   
     print("INIT");
   }
 
@@ -340,6 +350,8 @@ class _HomePageState extends State<HomePage> {
     //await getCurrentLocation();
 
     print("BUILD");
+    if(posts.isNotEmpty)
+      print(posts[0].toJson());
 
     return Scaffold(
       appBar: AppBar(
@@ -397,10 +409,12 @@ class _HomePageState extends State<HomePage> {
                           myLocationButtonEnabled: true,
                           markers: markers.values.toSet(),
                           onMapCreated: (GoogleMapController controller) {
+                            print("BUILD MAP");
                             _googleMapController.complete(controller);
                             controller.setMapStyle(_mapStyle);
                             updatePinOnMap(controller);
-                            createMarkers(controller);
+                            downloadClosePosts();
+                            createMarkers();
                           });
                     }
                   })),

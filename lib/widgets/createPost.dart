@@ -84,6 +84,8 @@ class _CreatePostState extends State<CreatePost> {
 
                   String messageId = uuid.v4();
 
+                  
+
                   Navigator.pop(context, {
                     'messageId': messageId,
                     'title': titleController.text,
