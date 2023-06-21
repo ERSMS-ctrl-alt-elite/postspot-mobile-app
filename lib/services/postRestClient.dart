@@ -17,11 +17,11 @@ class PostRestService {
     token = FirebaseAuth.instance.currentUser!.refreshToken;
   }
 
-  Future<void> createPost(Post post) async {
+  Future<http.Response> createPost(Post post) async {
     final jsonData = post.toJson();
     try {
-      await client.post(Uri.https(hostName, endpoint),
-          headers: {'Authorization': 'Bearer $token'}, body: jsonData);
+      return await client.post(Uri.https(hostName, endpoint),
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'}, body: jsonData);
     } finally {
       client.close();
     }
@@ -59,7 +59,7 @@ class PostRestService {
     Post post;
     try {
       var response = await client.get(Uri.https(hostName, endpoint + id),
-          headers: {'Authorization': 'Bearer $token'});
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'});
 
       var p = jsonDecode(response.body) as Map;
       post = Post(p['post_id'], p['author_google_id'], p['title'], p['content'],

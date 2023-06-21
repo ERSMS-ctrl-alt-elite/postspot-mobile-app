@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:postspot_mobile_app/services/postRestClient.dart';
 import 'package:uuid/uuid.dart';
 import 'package:postspot_mobile_app/data/post.dart';
+import 'package:location/location.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({super.key});
@@ -15,10 +17,19 @@ class _CreatePostState extends State<CreatePost> {
   final messageController = TextEditingController();
   var uuid = Uuid();
 
-  void createPost() {
-    //TODO
-
-  
+  Future<bool> createPost() async {
+    Location location = Location();
+    var myLocation = await location.getLocation();
+    if (myLocation.longitude == null && myLocation.latitude == null) {
+      return false;
+    }
+    //myLocation = LocationData.fromMap({"latitude": 52.13, "longitude": 21.00});
+    Post post = Post('', '', titleController.text, messageController.text, myLocation.longitude!, myLocation.latitude!);
+    var res = await PostRestService().createPost(post);
+    if (res.statusCode == 201) {
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -73,18 +84,28 @@ class _CreatePostState extends State<CreatePost> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Center(
                 child: ElevatedButton(
-              onPressed: () async{
+              onPressed: () async {
                 // Validate returns true if the form is valid, or false otherwise.
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  final messenger = ScaffoldMessenger.of(context);
+                  messenger.showSnackBar(
                     const SnackBar(content: Text('Sending post ...')),
                   );
 
                   String messageId = uuid.v4();
 
-                  
+                  var created = await createPost();
+                  if (created) {
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Successfully added post')),
+                    );
+                  } else {
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Failed to create post')),
+                    );
+                  }
 
                   Navigator.pop(context, {
                     'messageId': messageId,
