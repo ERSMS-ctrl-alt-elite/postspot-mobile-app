@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
 
   static var _initialCameraPosition;
   static var myLocation;
+  static var myRelativeLocation;
   var location = new Location();
   PermissionStatus? _permissionGranted;
   static const double ZOOM = 18.5;
@@ -79,6 +80,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<LocationData> getCurrentLocation() async {
+    print("GET CURRENT LOCATION");
     Location location = Location();
     location.getLocation().then(
       (location) {
@@ -104,6 +106,20 @@ class _HomePageState extends State<HomePage> {
       },
     );
     return myLocation;
+  }
+
+  bool checkRelativeLocation(){
+    if((myLocation - myRelativeLocation).abs() > 10){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  void downloadClosePosts() async{
+    print("DOWNLOAD POSTS");
+    posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longtitude);
   }
 
   void updatePinOnMap(GoogleMapController controller) async {

@@ -17,6 +17,8 @@ class _CreatePostState extends State<CreatePost> {
 
   void createPost() {
     //TODO
+
+  
   }
 
   @override
@@ -29,6 +31,7 @@ class _CreatePostState extends State<CreatePost> {
 
   @override
   Widget build(BuildContext context) {
+
     return Form(
       key: _formKey,
       child: Column(
@@ -70,7 +73,7 @@ class _CreatePostState extends State<CreatePost> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Center(
                 child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async{
                 // Validate returns true if the form is valid, or false otherwise.
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
@@ -80,8 +83,6 @@ class _CreatePostState extends State<CreatePost> {
                   );
 
                   String messageId = uuid.v4();
-
-                  createPost();
 
                   Navigator.pop(context, {
                     'messageId': messageId,

@@ -9,7 +9,7 @@ void main() async {
   await Firebase.initializeApp();
   runApp(MaterialApp(
     routes: {
-      '/': (context) => HomePage(),
+      '/home': (context) => HomePage(),
       '/createPost': (context) => PostPage(),
       '/login': (context) => AuthService().handleAuthState(),
     },
