@@ -42,8 +42,9 @@ class _LoginPageState extends State<LoginPage> {
                   backgroundColor: MaterialStateProperty.all(
                     Color.fromARGB(255, 253, 253, 253))
                 ),
-                onPressed: () {
+                onPressed: () async {
                   AuthService().signInWithGoogle();
+                  await AuthService().postUserToken();
                 },
                 child: Container(child: Row(children: const [
                   Image(width: 40, image: AssetImage('assets/google.png')),

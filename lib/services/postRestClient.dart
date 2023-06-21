@@ -8,10 +8,10 @@ class PostRestService {
   var lat;
   var lang;
 
-  var accessToken;
+  var token;
   var client = http.Client();
   
-  var hostName = "https://postspot-api-gateway-eu-dev-v1-0-8-a5mqnrt6.nw.gateway.dev";
+  var hostName = "postspot-api-gateway-eu-dev-v1-0-8-a5mqnrt6.nw.gateway.dev";
   var endpoint = "/v1/posts";
   Map<String,String> getQueryParameters = {};
 
@@ -19,7 +19,7 @@ class PostRestService {
     this.post = post;
     this.lat = lat;
     this.lang = lang;
-    this.accessToken = FirebaseAuth.instance.currentUser!.refreshToken;
+    this.token = FirebaseAuth.instance.currentUser!.refreshToken;
     getQueryParameters['lat'] = lat;
     getQueryParameters['lang'] = lang;
   }
@@ -30,7 +30,7 @@ class PostRestService {
       var response = await client.post(
         Uri.https(hostName,endpoint),
         headers:{
-          'token' : accessToken
+          'Authorization': 'Bearer $token'
         }, 
          body: jsonData);
     } finally {
@@ -43,11 +43,13 @@ class PostRestService {
       var response = await client.get(
         Uri.https(hostName,endpoint,getQueryParameters),
         headers:{
-          'token' : accessToken
+          'Authorization': 'Bearer $token'
         });
-    } finally {
+    }
+     finally {
       client.close();
     }
+    
   }
 
 }
