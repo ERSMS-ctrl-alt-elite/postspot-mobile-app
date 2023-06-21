@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import '../data/post.dart';
 import 'package:http/http.dart' as http;
@@ -11,15 +13,15 @@ class PostRestService {
   var endpoint = "/posts";
   Map<String, String> getQueryParameters = {};
 
-  PostRestService() {
-    token = FirebaseAuth.instance.currentUser!.refreshToken;
+  PostRestService() { token = 'sdfg fgdg';
+    //token = FirebaseAuth.instance.currentUser!.refreshToken;
   }
 
-  Future<void> createPost(Post post) async {
+  Future<http.Response> createPost(Post post) async {
     final jsonData = post.toJson();
     try {
-      await client.post(Uri.https(hostName, endpoint),
-          headers: {'Authorization': 'Bearer $token'}, body: jsonData);
+      return await client.post(Uri.https(hostName, endpoint),
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'}, body: jsonData);
     } finally {
       client.close();
     }
@@ -34,7 +36,7 @@ class PostRestService {
       print("TRY GET POSTS");
       var response = await client.get(
           Uri.https(hostName, endpoint, getQueryParameters),
-          headers: {'Authorization': 'Bearer $token'});
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'});
       print(response.body.toString());
       var decodedResponse = jsonDecode(response.body) as Map;
       print(decodedResponse);
@@ -56,7 +58,7 @@ class PostRestService {
     Post post;
     try {
       var response = await client.get(Uri.https(hostName, endpoint + id),
-          headers: {'Authorization': 'Bearer $token'});
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'});
 
       var p = jsonDecode(response.body) as Map;
       post = Post(p['post_id'], p['author_google_id'], p['title'], p['content'],

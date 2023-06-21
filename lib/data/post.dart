@@ -14,7 +14,7 @@ class Post {
         'author_google_id': author_google_id,
         'title': title,
         'content': content,
-        'longtitude': longtitude,
-        'latitude': latitude,
+        'longtitude': longtitude.toString(),
+        'latitude': latitude.toString(),
       };
 }
