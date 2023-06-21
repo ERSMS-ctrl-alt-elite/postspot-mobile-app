@@ -23,7 +23,6 @@ class _CreatePostState extends State<CreatePost> {
     if (myLocation.longitude == null && myLocation.latitude == null) {
       return false;
     }
-    //myLocation = LocationData.fromMap({"latitude": 52.13, "longitude": 21.00});
     Post post = Post('', '', titleController.text, messageController.text, myLocation.longitude!, myLocation.latitude!);
     var res = await PostRestService().createPost(post);
     if (res.statusCode == 201) {

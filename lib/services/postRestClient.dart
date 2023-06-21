@@ -6,19 +6,20 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class PostRestService {
-  var token;
+  Future<String>? futureToken;
   var client = http.Client();
 
   var hostName = "post-service-dev-svdlq5xita-lm.a.run.app";
-  var endpoint = "/posts";
+  var endpoint = "/v1/posts";
   Map<String, String> getQueryParameters = {};
 
-  PostRestService() { token = 'sdfg fgdg';
-    //token = FirebaseAuth.instance.currentUser!.refreshToken;
+  PostRestService() {
+    futureToken = FirebaseAuth.instance.currentUser!.getIdToken();
   }
 
   Future<http.Response> createPost(Post post) async {
     final jsonData = post.toJson();
+    var token = await futureToken;
     try {
       return await client.post(Uri.https(hostName, endpoint),
           headers: {'X-Forwarded-Authorization': 'Bearer $token'}, body: jsonData);
@@ -32,6 +33,7 @@ class PostRestService {
     List<Post> posts = List.empty(growable: true);
     getQueryParameters['lat'] = lat.toString();
     getQueryParameters['lang'] = lang.toString();
+    var token = await futureToken;
     try {
       print("TRY GET POSTS");
       var response = await client.get(
@@ -56,6 +58,7 @@ class PostRestService {
 
   Future<Post> getPost(String id) async {
     Post post;
+    var token = await futureToken;
     try {
       var response = await client.get(Uri.https(hostName, endpoint + id),
           headers: {'X-Forwarded-Authorization': 'Bearer $token'});

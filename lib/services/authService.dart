@@ -50,6 +50,7 @@ class AuthService {
   }
 
   Future<void> postUserToken() async {
+    await AuthService().signInWithGoogle();
     try {
       var response = await client.post(Uri.https(hostName, endpoint),
           headers: {'Authorization': 'Bearer $token'}, body: '');
