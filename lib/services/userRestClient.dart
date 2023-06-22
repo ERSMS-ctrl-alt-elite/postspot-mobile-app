@@ -37,7 +37,7 @@ class UserRestService {
 
   Future<List<usser.User>> getFollowees(String google_id) async {
     List<usser.User> users = List.empty(growable: true);
-    print("REST getName");
+    print("REST getFollowees");
     var token = await futureToken;
     try {
       var rspn = await client.get(
