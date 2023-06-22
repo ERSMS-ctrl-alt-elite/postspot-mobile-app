@@ -23,8 +23,7 @@ class PostRestService {
     var token = await futureToken;
     try {
       return await client.post(Uri.https(hostName, endpoint),
-          headers: {'X-Forwarded-Authorization': 'Bearer $token'},
-          body: jsonData);
+          headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'}, body: jsonEncode(jsonData));
     } finally {
       client.close();
     }
@@ -65,7 +64,7 @@ class PostRestService {
     var token = await futureToken;
     try {
       var response = await client.get(Uri.https(hostName, endpoint + "/" + id),
-          headers: {'X-Forwarded-Authorization': 'Bearer $token'});
+          headers: {'Authorization': 'Bearer $token'});
       print(hostName + endpoint + "/" + id);
       var p = jsonDecode(response.body) as Map;
       post = Post(p['post_id'], p['author_google_id'], p['title'], p['content'],
