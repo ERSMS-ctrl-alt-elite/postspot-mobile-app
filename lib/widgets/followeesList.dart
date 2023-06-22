@@ -5,6 +5,7 @@ import 'package:postspot_mobile_app/data/post.dart';
 import 'package:location/location.dart';
 import 'package:postspot_mobile_app/data/user.dart' as us;
 import 'package:postspot_mobile_app/services/userRestClient.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FolloweesList extends StatefulWidget {
   const FolloweesList({super.key});
@@ -23,9 +24,11 @@ class _FolloweesListState extends State<FolloweesList> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) async{
 
-    //followees = await UserRestService().getFollowees()
+    var id = FirebaseAuth.instance.currentUser!.uid;
+    print(id)
+    followees = await UserRestService().getFollowees(id);
 
     return Text("hello");
   }
