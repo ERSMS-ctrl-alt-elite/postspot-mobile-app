@@ -80,9 +80,9 @@ class _HomePageState extends State<HomePage> {
 
     // POBIERANIE POSTÓW - DZIAŁA W PĘTLI UWAGA!!!
     //posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
-    if (checkRelativeLocation()) {
-      downloadClosePosts();
-    }
+    //if (checkRelativeLocation()) {
+      //await downloadClosePostsAndUpdateMarks();
+    //}
   }
 
   Future<LocationData> getCurrentLocation() async {
@@ -125,11 +125,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void downloadClosePosts() {
+  Future<void> downloadClosePostsAndUpdateMarks() async {
     print("DOWNLOAD POSTS");
-    setState(() async {
-      posts = await PostRestService()
+    var res = await PostRestService()
           .getPosts(myLocation.latitude, myLocation.longitude);
+    setState(() {
+      posts = res;
       createMarkers();
     });
   }
@@ -172,10 +173,10 @@ class _HomePageState extends State<HomePage> {
       const Duration(seconds: 1),
       (Timer timer) {
         if (time == 0) {
+          downloadClosePostsAndUpdateMarks();
           setState(() {
             time = period;
-            downloadClosePosts();
-            createMarkers();
+            //createMarkers();
           });
         } else {
           setState(() {

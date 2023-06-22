@@ -45,7 +45,7 @@ class PostRestService {
           Uri.https(hostName,
               endpoint + "/" + lang.toString() + "/" + lat.toString()),
           headers: {'Authorization': 'Bearer $token'});
-      print(hostName + endpoint + "/" + lat.toString() + "/" + lang.toString());
+      print(hostName + endpoint + "/" + lang.toString() + "/" + lat.toString());
       print(response.body.toString());
       var decodedResponse = jsonDecode(response.body) as Map;
       print(decodedResponse);
