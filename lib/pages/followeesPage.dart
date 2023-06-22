@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:postspot_mobile_app/widgets/createPost.dart';
 import 'package:postspot_mobile_app/widgets/followeesList.dart';
 
-class PostPage extends StatefulWidget {
-  const PostPage({super.key});
+class FolloweesPage extends StatefulWidget {
+  const FolloweesPage({super.key});
 
   @override
-  State<PostPage> createState() => _PostPageState();
+  State<FolloweesPage> createState() => _FolloweesPageState();
 }
 
-class _PostPageState extends State<PostPage> {
+class _FolloweesPageState extends State<FolloweesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
