@@ -49,6 +49,10 @@ class PostRestService {
       print(response.body.toString());
       var decodedResponse = jsonDecode(response.body) as Map;
       print(decodedResponse);
+
+      if (!decodedResponse.containsKey('post')) {
+        return posts;
+      }
       List plist = decodedResponse['post'];
 
       for (var i = 0; i < plist.length; i++) {

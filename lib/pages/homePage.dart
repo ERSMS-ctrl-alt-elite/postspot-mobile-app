@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   Set<Marker> _markers = Set<Marker>();
   var messageIcon;
   var messageOpenIcon;
+  static const int timerPeriod = 5;
 
   final Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
@@ -167,7 +168,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void startPostsTimer() {
-    int period = 10;
     int time = 0;
     _timer = Timer.periodic(
       const Duration(seconds: 1),
@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage> {
         if (time == 0) {
           downloadClosePostsAndUpdateMarks();
           setState(() {
-            time = period;
+            time = timerPeriod;
             //createMarkers();
           });
         } else {
