@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:postspot_mobile_app/data/user.dart' as usser;
 
 class UserRestService {
-  var token;
+  Future<String>? futureToken;
   var client = http.Client();
 
   var hostName = "postspot-api-gateway-eu-dev-a5mqnrt6.nw.gateway.dev";
@@ -14,12 +14,13 @@ class UserRestService {
   Map<String, String> getQueryParameters = {};
 
   PostRestService() {
-    token = FirebaseAuth.instance.currentUser!.refreshToken;
+    futureToken = FirebaseAuth.instance.currentUser!.getIdToken();
   }
 
   Future<usser.User> getName(String google_id) async {
     usser.User user;
     print("REST getName");
+    var token = await futureToken;
     try {
       var rspn = await client.get(
           Uri.https(hostName, endpoint + "/" + google_id),
@@ -35,6 +36,7 @@ class UserRestService {
   Future<List<usser.User>> getFollowees(String google_id) async {
     List<usser.User> users = List.empty(growable: true);
     print("REST getName");
+    var token = await futureToken;
     try {
       var rspn = await client.get(
           Uri.https(hostName, endpoint + "/" + google_id + "/followees"),
