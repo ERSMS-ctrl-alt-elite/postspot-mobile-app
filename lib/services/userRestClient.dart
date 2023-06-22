@@ -13,7 +13,7 @@ class UserRestService {
   var endpoint = "/v1/users";
   Map<String, String> getQueryParameters = {};
 
-  PostRestService() {
+  UserRestService() {
     futureToken = FirebaseAuth.instance.currentUser!.getIdToken();
   }
 
