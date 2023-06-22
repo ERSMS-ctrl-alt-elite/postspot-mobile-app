@@ -441,7 +441,7 @@ class _HomePageState extends State<HomePage> {
                 AuthService().signOut();
                 Navigator.pushReplacementNamed(context, '/login');
               },
-              icon: const Icon(Icons.account_circle_sharp),
+              icon: const Icon(Icons.exit_to_app_rounded),
               color: Colors.white,
               iconSize: 40.0,
               padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
