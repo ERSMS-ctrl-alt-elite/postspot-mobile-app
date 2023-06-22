@@ -6,10 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  var token;
+  Future<String>? futureToken;
   var client = http.Client();
 
-  var hostName = r"postspot-api-gateway-eu-dev-v1-0-8-a5mqnrt6.nw.gateway.dev";
+  var hostName = r"user-service-dev-svdlq5xita-lm.a.run.app";
   var endpoint = r"/v1/users";
 
   //Determine if the user is authenticated.
@@ -18,7 +18,7 @@ class AuthService {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData) {
-            token = snapshot.data!.refreshToken;
+            futureToken = snapshot.data!.getIdToken();
             return HomePage();
           } else {
             return const LoginPage();
@@ -51,9 +51,11 @@ class AuthService {
 
   Future<void> postUserToken() async {
     await AuthService().signInWithGoogle();
+    futureToken = FirebaseAuth.instance.currentUser!.getIdToken();
+    var token = await futureToken;
     try {
       var response = await client.post(Uri.https(hostName, endpoint),
-          headers: {'Authorization': 'Bearer $token'}, body: '');
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'}, body: '');
       print("LOGIN - send token ");
     } finally {
       client.close();
