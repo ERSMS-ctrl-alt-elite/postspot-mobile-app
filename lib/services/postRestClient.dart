@@ -82,4 +82,36 @@ class PostRestService {
     }
     return post;
   }
+
+  Future<List<Post>> getPostsByauthor(String id) async {
+    print("START GET POSTS by "+id);
+    List<Post> posts = List.empty(growable: true);
+    var token = await futureToken;
+    try {
+      print("TRY GET POSTS");
+      var response = await client.get(
+          Uri.https(hostName,
+              endpoint, {'author': id} ),
+          headers: {'Authorization': 'Bearer $token'});
+      print(hostName + endpoint);
+      print(response.body.toString());
+      var decodedResponse = jsonDecode(response.body) as Map;
+      print(decodedResponse);
+
+      if (!decodedResponse.containsKey('post')) {
+        return posts;
+      }
+      List plist = decodedResponse['post'];
+
+      for (var i = 0; i < plist.length; i++) {
+        Map p = plist[i];
+        posts.add(Post(p['post_id'], p['author_google_id'], p['title'],
+            p['content'], p['longitude'], p['latitude'], ""));
+      }
+    } finally {
+      client.close();
+    }
+    print("END GET POSTS by "+id);
+    return posts;
+  }
 }
