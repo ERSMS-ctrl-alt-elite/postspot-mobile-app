@@ -24,8 +24,9 @@ class _FolloweesListState extends State<FolloweesList> {
   }
 
   @override
-  Widget build(BuildContext context){
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{});
+  Widget build(BuildContext context) {
+    final arguments =
+        (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{});
     //followees = List;
 
     return Text("hello");

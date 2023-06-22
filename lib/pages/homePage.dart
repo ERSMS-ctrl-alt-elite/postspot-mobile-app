@@ -168,7 +168,8 @@ class _HomePageState extends State<HomePage> {
   void startPostsTimer() {
     int period = 10;
     int time = 0;
-    _timer = Timer.periodic(const Duration(seconds: 1),
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
       (Timer timer) {
         if (time == 0) {
           setState(() {
@@ -184,7 +185,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
 
   void setInitMarkersPostsTEST() async {
     var mess1 = LatLng(52.2606860, 20.9329840);
@@ -257,7 +257,8 @@ class _HomePageState extends State<HomePage> {
               print("OPEN MESSAGE");
               print(MarkerId(p.post_id).value);
 
-              us.User user = await UserRestService().getName(p.author_google_id);
+              us.User user =
+                  await UserRestService().getName(p.author_google_id);
               p.name = user.name!;
 
               showDialog(
@@ -291,32 +292,41 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Flexible(child: Text(posts[i].content)),
-                                  Flexible(child: SizedBox(height:40)),
+                                  Flexible(child: SizedBox(height: 40)),
                                   Flexible(
-                                    child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                      Text(p.name),
-                          
-                                      IconButton(
-                                        onPressed: () async{
-                                          var response = await UserRestService().follow(p.author_google_id);
-                                          print(response);
-                                          final messenger = ScaffoldMessenger.of(context);
-                                          if (response == "User followed") {
-                    messenger.showSnackBar(
-                      const SnackBar(content: Text('User successfully followed!')),
-                    );
-                  } else {
-                    messenger.showSnackBar(
-                      const SnackBar(content: Text('Failed to follow user :(')),
-                    );
-                  }
-                                        },
-                                        icon: const Icon(Icons.add),
-              color: const Color.fromARGB(255, 64, 100, 133),
-              iconSize: 35.0,)])
-                                    
-                                  )
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                        Text(p.name),
+                                        IconButton(
+                                          onPressed: () async {
+                                            var response =
+                                                await UserRestService()
+                                                    .follow(p.author_google_id);
+                                            print(response);
+                                            final messenger =
+                                                ScaffoldMessenger.of(context);
+                                            if (response == "User followed") {
+                                              messenger.showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        'User successfully followed!')),
+                                              );
+                                            } else {
+                                              messenger.showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        'Failed to follow user :(')),
+                                              );
+                                            }
+                                          },
+                                          icon: const Icon(Icons.add),
+                                          color: const Color.fromARGB(
+                                              255, 64, 100, 133),
+                                          iconSize: 35.0,
+                                        )
+                                      ]))
                                 ],
                               )),
                         ],
@@ -507,20 +517,28 @@ class _HomePageState extends State<HomePage> {
                         child: Center(
                             child: IconButton(
                           onPressed: () async {
-                            
-                            final User? currentUser = FirebaseAuth.instance.currentUser;
+                            final User? currentUser =
+                                FirebaseAuth.instance.currentUser;
                             var googleId;
-  if (currentUser != null) {
-    currentUser.getIdTokenResult().then((idTokenResult) {
-      googleId = idTokenResult.claims!['firebase']['identities']['google.com'][0];
-      print('Google ID: $googleId');
-    }).catchError((error) {
-      print('Błąd podczas pobierania Google ID: $error');
-    });
-  } print('Google ID: $googleId');
-                            var followeesRspn = await UserRestService().getFollowees(googleId);
+                            if (currentUser != null) {
+                              currentUser
+                                  .getIdTokenResult()
+                                  .then((idTokenResult) async{
+                                googleId = idTokenResult.claims!['firebase']
+                                    ['identities']['google.com'][0];
+                                print('Google ID: $googleId');
+                                print('Google ID: $googleId');
+                            var followeesRspn =
+                                await UserRestService().getFollowees(googleId);
                             dynamic result = await Navigator.pushNamed(
-                                context, '/follower',arguments: {"followees":followeesRspn});
+                                context, '/follower',
+                                arguments: {"followees": followeesRspn});
+                              }).catchError((error) {
+                                print(
+                                    'Błąd podczas pobierania Google ID: $error');
+                              });
+                            }
+                            
                           },
                           icon: const Icon(Icons.group_sharp),
                           color: Colors.white,

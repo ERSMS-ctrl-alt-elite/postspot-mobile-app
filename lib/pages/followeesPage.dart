@@ -12,7 +12,8 @@ class FolloweesPage extends StatefulWidget {
 class _FolloweesPageState extends State<FolloweesPage> {
   @override
   Widget build(BuildContext context) {
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{});
+    final arguments =
+        (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{});
     print(arguments.toString());
 
     return Scaffold(
