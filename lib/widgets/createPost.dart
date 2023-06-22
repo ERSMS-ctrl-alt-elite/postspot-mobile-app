@@ -18,8 +18,10 @@ class _CreatePostState extends State<CreatePost> {
   var uuid = Uuid();
 
   Future<bool> createPost() async {
+    print("START createPost");
     Location location = Location();
     var myLocation = await location.getLocation();
+    print("CREATE POST - my locations: " + myLocation.latitude.toString());
     if (myLocation.longitude == null && myLocation.latitude == null) {
       return false;
     }
@@ -27,6 +29,9 @@ class _CreatePostState extends State<CreatePost> {
     Post post = Post('', '', titleController.text, messageController.text,
         myLocation.longitude!, myLocation.latitude!);
     var res = await PostRestService().createPost(post);
+    print(res.statusCode);
+    print(res.reasonPhrase);
+    print(res.body);
     if (res.statusCode == 201) {
       return true;
     }
@@ -96,6 +101,7 @@ class _CreatePostState extends State<CreatePost> {
 
                   String messageId = uuid.v4();
 
+                  print("PRE-START createPost");
                   var created = await createPost();
                   if (created) {
                     messenger.showSnackBar(

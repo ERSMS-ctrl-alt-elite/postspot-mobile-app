@@ -226,7 +226,7 @@ class _HomePageState extends State<HomePage> {
           icon: BitmapDescriptor.fromBytes(
               distance < 10 ? messageOpenIcon : messageIcon),
           consumeTapEvents: true,
-          onTap: () async{
+          onTap: () async {
             // Kod obsługi naciśnięcia przycisku dla tego markera
             if (distance < 10) {
               print("TEST DISTANCE: " + distance.toString());
@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                       title: Text(posts[i].title),
+                      title: Text(posts[i].title),
                       content: Stack(
                         //overflow: Overflow.visible,
                         children: <Widget>[
@@ -258,18 +258,19 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                         Container(
-        width: double.infinity,
-        
-         child:Column(mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(child:Text(posts[i].content)),
-            Flexible(child: ElevatedButton(onPressed: (){},
-            child: Text("Follow user")
-            )
-            ,)
-         ],)),
-                       
+                          Container(
+                              width: double.infinity,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(child: Text(posts[i].content)),
+                                  Flexible(
+                                    child: ElevatedButton(
+                                        onPressed: () {},
+                                        child: Text("Follow user")),
+                                  )
+                                ],
+                              )),
                         ],
                       ),
                     );
