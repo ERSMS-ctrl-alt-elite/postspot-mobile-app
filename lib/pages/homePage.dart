@@ -486,8 +486,11 @@ class _HomePageState extends State<HomePage> {
                         child: Center(
                             child: IconButton(
                           onPressed: () async {
+                            var id = FirebaseAuth.instance.currentUser!.uid;
+    print("UID: "+ id.toString());
+                            var response = await UserRestService().getFollowees(id);
                             dynamic result = await Navigator.pushNamed(
-                                context, '/follower');
+                                context, '/follower',arguments: {"followees":response});
                           },
                           icon: const Icon(Icons.group_sharp),
                           color: Colors.white,
