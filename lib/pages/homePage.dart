@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
   var messageIcon;
   var messageOpenIcon;
   static const int timerPeriod = 5;
+  String? trackedUserId;
 
   final Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
@@ -128,10 +129,17 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> downloadClosePostsAndUpdateMarks() async {
     print("DOWNLOAD POSTS");
-    var res = await PostRestService()
-          .getPosts(myLocation.latitude, myLocation.longitude);
+    List<Post>? res;
+    if (trackedUserId != null) {
+       res = await PostRestService()
+        .getPostsByauthor(trackedUserId!);
+    } else {
+      res = await PostRestService()
+        .getPosts(myLocation.latitude, myLocation.longitude);
+    }
+     
     setState(() {
-      posts = res;
+      posts = res!;
       createMarkers();
     });
   }
