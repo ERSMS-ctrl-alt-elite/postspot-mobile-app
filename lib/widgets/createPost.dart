@@ -26,6 +26,7 @@ class _CreatePostState extends State<CreatePost> {
       return false;
     }
     Post post = Post('', '', titleController.text, messageController.text, myLocation.longitude!, myLocation.latitude!);
+    print (post.toJson());
     var res = await PostRestService().createPost(post);
     print(res.statusCode);
     print(res.reasonPhrase);

@@ -218,11 +218,11 @@ class _HomePageState extends State<HomePage> {
     for (var i = 0; i < posts.length; i++) {
       var p = posts[i];
       var distance = calculateDistance(
-          myLocation.latitude, myLocation.longitude, p.latitude, p.longtitude);
+          myLocation.latitude, myLocation.longitude, p.latitude, p.longitude);
 
       final marker = Marker(
           markerId: MarkerId(p.post_id),
-          position: LatLng(p.latitude, p.longtitude),
+          position: LatLng(p.latitude, p.longitude),
           icon: BitmapDescriptor.fromBytes(
               distance < 10 ? messageOpenIcon : messageIcon),
           consumeTapEvents: true,

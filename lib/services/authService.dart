@@ -9,7 +9,7 @@ class AuthService {
   Future<String>? futureToken;
   var client = http.Client();
 
-  var hostName = r"user-service-dev-svdlq5xita-lm.a.run.app";
+  var hostName = r"postspot-api-gateway-eu-dev-a5mqnrt6.nw.gateway.dev";
   var endpoint = r"/v1/users";
 
   //Determine if the user is authenticated.
@@ -55,7 +55,7 @@ class AuthService {
     var token = await futureToken;
     try {
       var response = await client.post(Uri.https(hostName, endpoint),
-          headers: {'X-Forwarded-Authorization': 'Bearer $token'}, body: '');
+          headers: {'Authorization': 'Bearer $token'}, body: '');
       print("LOGIN - send token ");
     } finally {
       client.close();
