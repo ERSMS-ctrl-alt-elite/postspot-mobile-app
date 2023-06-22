@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   Set<Marker> _markers = Set<Marker>();
   var messageIcon;
   var messageOpenIcon;
+  static const int timerPeriod = 5;
 
   final Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
@@ -80,9 +81,9 @@ class _HomePageState extends State<HomePage> {
 
     // POBIERANIE POSTÓW - DZIAŁA W PĘTLI UWAGA!!!
     //posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
-    if (checkRelativeLocation()) {
-      downloadClosePosts();
-    }
+    //if (checkRelativeLocation()) {
+      //await downloadClosePostsAndUpdateMarks();
+    //}
   }
 
   Future<LocationData> getCurrentLocation() async {
@@ -125,11 +126,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void downloadClosePosts() {
+  Future<void> downloadClosePostsAndUpdateMarks() async {
     print("DOWNLOAD POSTS");
-    setState(() async {
-      posts = await PostRestService()
+    var res = await PostRestService()
           .getPosts(myLocation.latitude, myLocation.longitude);
+    setState(() {
+      posts = res;
       createMarkers();
     });
   }
@@ -166,16 +168,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void startPostsTimer() {
-    int period = 10;
     int time = 0;
     _timer = Timer.periodic(
       const Duration(seconds: 1),
       (Timer timer) {
         if (time == 0) {
+          downloadClosePostsAndUpdateMarks();
           setState(() {
-            time = period;
-            downloadClosePosts();
-            createMarkers();
+            time = timerPeriod;
+            //createMarkers();
           });
         } else {
           setState(() {
