@@ -79,7 +79,7 @@ class _FolloweesPageState extends State<FolloweesPage> {
                                 
                                 print('Google ID: $googleId');
                              var postsRspn =
-                                await PostRestService().getPostsByauthor(argfollowees[index].name);
+                                await PostRestService().getPostsByauthor(argfollowees[index].google_id);
                             dynamic result = await Navigator.pushNamed(
                                 context, '/readPosts',
                                 arguments: {"posts": postsRspn});

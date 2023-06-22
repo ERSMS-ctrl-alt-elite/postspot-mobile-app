@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:postspot_mobile_app/data/post.dart';
 import 'package:postspot_mobile_app/widgets/createPost.dart';
 import 'package:postspot_mobile_app/data/user.dart' as us;
 
@@ -10,7 +11,7 @@ class readPostsPage extends StatefulWidget {
 }
 
 class _readPostsPageState extends State<readPostsPage> {
-  List<us.User> users = List.empty(growable: true);
+  List<Post> posts = List.empty(growable: true);
 
   @override
   Widget build(BuildContext context) {
@@ -18,21 +19,17 @@ class _readPostsPageState extends State<readPostsPage> {
         (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
     print(arguments.toString());
 
-    List argfollowees = arguments['followees'];
+    List argfollowees = arguments['posts'];
     print("TESTTTTTTT");
     print(argfollowees.length);
-    print(argfollowees[0].name);
-
-    for (var i = 0; i < argfollowees.length; i++) {
-      users.add(us.User(argfollowees[i].google_id, argfollowees[i].name));
-    }
+    print(argfollowees[0].content);
 
 
     return Scaffold(
         appBar: AppBar(
             title: Row(children: [
               Icon(Icons.edit_location_alt_outlined),
-              Text('Followees',
+              Text('User posts',
                   style: TextStyle(
                     letterSpacing: 1.5,
                     fontWeight: FontWeight.bold,
@@ -52,7 +49,7 @@ class _readPostsPageState extends State<readPostsPage> {
           
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text(argfollowees[index].name,
+              title: Text(argfollowees[index].title,
               style: TextStyle(
                 
                 color: Color.fromARGB(255, 64, 100, 133), fontSize: 20
@@ -60,15 +57,14 @@ class _readPostsPageState extends State<readPostsPage> {
 
               )
               ),
-              trailing: ElevatedButton(
-              onPressed: () {
-                // Obsługa naciśnięcia przycisku
-                
-              },
-              child: Text('read posts'),
-              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromARGB(255, 64, 100, 133))),
-              
-            ));
+              subtitle: Text(argfollowees[index].content,
+              style: TextStyle(
+                fontSize: 15
+
+
+              )
+              )
+             );
           },
         ),);
 
