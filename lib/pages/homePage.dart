@@ -486,11 +486,20 @@ class _HomePageState extends State<HomePage> {
                         child: Center(
                             child: IconButton(
                           onPressed: () async {
-                            var id = FirebaseAuth.instance.currentUser!.uid;
-    print("UID: "+ id.toString());
-                            var response = await UserRestService().getFollowees(id);
+                            
+                            final User? currentUser = FirebaseAuth.instance.currentUser;
+                            var googleId;
+  if (currentUser != null) {
+    currentUser.getIdTokenResult().then((idTokenResult) {
+      googleId = idTokenResult.claims!['firebase']['identities']['google.com'][0];
+      print('Google ID: $googleId');
+    }).catchError((error) {
+      print('Błąd podczas pobierania Google ID: $error');
+    });
+  } print('Google ID: $googleId');
+                            var followeesRspn = await UserRestService().getFollowees(googleId);
                             dynamic result = await Navigator.pushNamed(
-                                context, '/follower',arguments: {"followees":response});
+                                context, '/follower',arguments: {"followees":followeesRspn});
                           },
                           icon: const Icon(Icons.group_sharp),
                           color: Colors.white,
