@@ -24,13 +24,7 @@ class _PostPageState extends State<PostPage> {
             ]),
             backgroundColor: Color.fromARGB(255, 64, 100, 133),
             actions: <Widget>[
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.account_circle_sharp),
-                color: Colors.white,
-                iconSize: 40.0,
-                padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
-              )
+              
             ]),
         body: const CreatePost());
   }

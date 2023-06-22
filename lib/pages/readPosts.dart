@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:postspot_mobile_app/widgets/createPost.dart';
 import 'package:postspot_mobile_app/data/user.dart' as us;
 
-class FolloweesPage extends StatefulWidget {
-  const FolloweesPage({super.key});
+class readPostsPage extends StatefulWidget {
+  const readPostsPage({super.key});
 
   @override
-  State<FolloweesPage> createState() => _FolloweesPageState();
+  State<readPostsPage> createState() => _readPostsPageState();
 }
 
-class _FolloweesPageState extends State<FolloweesPage> {
+class _readPostsPageState extends State<readPostsPage> {
   List<us.User> users = List.empty(growable: true);
 
   @override
