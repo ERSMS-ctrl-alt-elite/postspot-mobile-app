@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:postspot_mobile_app/services/postRestClient.dart';
 import 'package:postspot_mobile_app/widgets/createPost.dart';
 import 'package:postspot_mobile_app/data/user.dart' as us;
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FolloweesPage extends StatefulWidget {
   const FolloweesPage({super.key});
@@ -61,9 +63,31 @@ class _FolloweesPageState extends State<FolloweesPage> {
               )
               ),
               trailing: ElevatedButton(
-              onPressed: () {
+              onPressed: ()async  {
                 // Obsługa naciśnięcia przycisku
-                
+                final User? currentUser =
+                                FirebaseAuth.instance.currentUser;
+                            var googleId;
+               
+                                  
+                                  if (currentUser != null) {
+                              currentUser
+                                  .getIdTokenResult()
+                                  .then((idTokenResult) async{
+                                googleId = idTokenResult.claims!['firebase']
+                                    ['identities']['google.com'][0];
+                                
+                                print('Google ID: $googleId');
+                             var postsRspn =
+                                await PostRestService().getPostsByauthor(argfollowees[index].name);
+                            dynamic result = await Navigator.pushNamed(
+                                context, '/readPosts',
+                                arguments: {"posts": postsRspn});
+                              }).catchError((error) {
+                                print(
+                                    'Błąd podczas pobierania Google ID: $error');
+                              });
+                            }
               },
               child: Text('read posts'),
               style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromARGB(255, 64, 100, 133))),
