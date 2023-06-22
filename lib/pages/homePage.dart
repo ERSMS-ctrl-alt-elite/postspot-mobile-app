@@ -8,11 +8,13 @@ import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'dart:math';
 import 'package:geolocator/geolocator.dart';
-import 'package:postspot_mobile_app/data/message.dart';
 import 'package:postspot_mobile_app/services/authService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:postspot_mobile_app/services/postRestClient.dart';
 import 'package:postspot_mobile_app/data/post.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:postspot_mobile_app/services/userRestClient.dart';
+import 'package:postspot_mobile_app/data/user.dart' as us;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -233,6 +235,9 @@ class _HomePageState extends State<HomePage> {
               print("OPEN MESSAGE");
               print(MarkerId(p.post_id).value);
 
+              us.User user = await UserRestService().getName(p.author_google_id);
+              p.name = user.name!;
+
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -264,10 +269,31 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Flexible(child: Text(posts[i].content)),
+                                  Flexible(child: SizedBox(height:40)),
                                   Flexible(
-                                    child: ElevatedButton(
-                                        onPressed: () {},
-                                        child: Text("Follow user")),
+                                    child: Row(mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                      Text(p.name),
+                          
+                                      IconButton(
+                                        onPressed: () async{
+                                          var response = await UserRestService().follow(p.author_google_id);
+                                          print(response);
+                                          final messenger = ScaffoldMessenger.of(context);
+                                          if (response == "User followed") {
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('User successfully followed!')),
+                    );
+                  } else {
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Failed to follow user :(')),
+                    );
+                  }
+                                        },
+                                        icon: const Icon(Icons.add),
+              color: const Color.fromARGB(255, 64, 100, 133),
+              iconSize: 35.0,)])
+                                    
                                   )
                                 ],
                               )),
@@ -286,11 +312,11 @@ class _HomePageState extends State<HomePage> {
 
   void initPostsTEST() {
     posts.add(
-        Post('1', 'google1', 'Title1', 'message1', 20.9329840, 52.2606860));
+        Post('1', 'google1', 'Title1', 'message1', 20.9329840, 52.2606860, ""));
     posts.add(
-        Post('2', 'google2', 'Title2', 'message2', 20.9327200, 52.2610000));
+        Post('2', 'google2', 'Title2', 'message2', 20.9327200, 52.2610000, ""));
     posts.add(
-        Post('3', 'google3', 'Title3', 'message3', 20.9326040, 52.2606360));
+        Post('3', 'google3', 'Title3', 'message3', 20.9326040, 52.2606360, ""));
   }
 
   void setMarkersIcon() async {

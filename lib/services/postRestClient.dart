@@ -51,7 +51,7 @@ class PostRestService {
       for (var i = 0; i < plist.length; i++) {
         Map p = plist[i];
         posts.add(Post(p['post_id'], p['author_google_id'], p['title'],
-            p['content'], p['longitude'], p['latitude']));
+            p['content'], p['longitude'], p['latitude'],""));
       }
     } finally {
       client.close();
@@ -69,7 +69,7 @@ class PostRestService {
       print(hostName + endpoint + "/" + id);
       var p = jsonDecode(response.body) as Map;
       post = Post(p['post_id'], p['author_google_id'], p['title'], p['content'],
-          p['longitude'], p['latitude']);
+          p['longitude'], p['latitude'],"");
     } finally {
       client.close();
     }

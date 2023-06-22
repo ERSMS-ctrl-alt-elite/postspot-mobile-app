@@ -25,6 +25,8 @@ class UserRestService {
       var rspn = await client.get(
           Uri.https(hostName, endpoint + "/" + google_id),
           headers: {'X-Forwarded-Authorization': 'Bearer $token'});
+      print(hostName+ endpoint + "/" + google_id);
+      print(rspn.body);
       var u = jsonDecode(rspn.body) as Map;
       user = usser.User(u['google_id'], u['name']);
     } finally {
@@ -52,5 +54,22 @@ class UserRestService {
       client.close();
     }
     return users;
+  }
+
+
+  Future<String> follow(String google_id) async {
+    var rspn;
+    List<usser.User> users = List.empty(growable: true);
+    print("REST follow");
+    var token = await futureToken;
+    try {
+      rspn = await client.post(
+          Uri.https(hostName, endpoint + "/" + google_id + "/followers"),
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'});
+      
+    } finally {
+      client.close();
+    }
+    return rspn.body;
   }
 }

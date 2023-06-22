@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "932746634099-0g2b1hvc7pnmc0pqi67u82csfnjsi0kl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.postspot_mobile_app",
+            "certificate_hash": "6b7dd6a757ca740e8e4d7f2faa7381222e92f264"
+          }
+        },
+        {
           "client_id": "932746634099-bb94m03rt06tjbvlic77v642n8ffepht.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

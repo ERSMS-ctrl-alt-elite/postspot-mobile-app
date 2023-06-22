@@ -25,7 +25,7 @@ class _CreatePostState extends State<CreatePost> {
     if (myLocation.longitude == null && myLocation.latitude == null) {
       return false;
     }
-    Post post = Post('', '', titleController.text, messageController.text, myLocation.longitude!, myLocation.latitude!);
+    Post post = Post('', '', titleController.text, messageController.text, myLocation.longitude!, myLocation.latitude!,"");
     var res = await PostRestService().createPost(post);
     print(res.statusCode);
     print(res.reasonPhrase);
