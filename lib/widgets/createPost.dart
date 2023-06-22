@@ -24,7 +24,8 @@ class _CreatePostState extends State<CreatePost> {
       return false;
     }
     //myLocation = LocationData.fromMap({"latitude": 52.13, "longitude": 21.00});
-    Post post = Post('', '', titleController.text, messageController.text, myLocation.longitude!, myLocation.latitude!);
+    Post post = Post('', '', titleController.text, messageController.text,
+        myLocation.longitude!, myLocation.latitude!);
     var res = await PostRestService().createPost(post);
     if (res.statusCode == 201) {
       return true;
@@ -42,7 +43,6 @@ class _CreatePostState extends State<CreatePost> {
 
   @override
   Widget build(BuildContext context) {
-
     return Form(
       key: _formKey,
       child: Column(

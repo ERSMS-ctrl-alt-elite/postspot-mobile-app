@@ -27,7 +27,8 @@ class _HomePageState extends State<HomePage> {
 
   static var _initialCameraPosition;
   static var myLocation;
-  static LocationData myRelativeLocation = LocationData.fromMap({"latitude": 0.0, "longitude": 0.0});
+  static LocationData myRelativeLocation =
+      LocationData.fromMap({"latitude": 0.0, "longitude": 0.0});
   var location = new Location();
   PermissionStatus? _permissionGranted;
   static const double ZOOM = 18.5;
@@ -53,7 +54,6 @@ class _HomePageState extends State<HomePage> {
           LocationData.fromMap({"latitude": 52.13, "longitude": 21.00});
     }
 
-    
     return myLocation;
   }
 
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
 
     // POBIERANIE POSTÓW - DZIAŁA W PĘTLI UWAGA!!!
     //posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
-    if(checkRelativeLocation()){
+    if (checkRelativeLocation()) {
       downloadClosePosts();
     }
   }
@@ -111,24 +111,24 @@ class _HomePageState extends State<HomePage> {
     return myLocation;
   }
 
-
-  bool checkRelativeLocation(){
-    if((myLocation.latitude - myRelativeLocation.latitude).abs() > 10.0 ||
-        (myRelativeLocation.longitude! - myRelativeLocation.longitude!).abs() > 10.0){
+  bool checkRelativeLocation() {
+    if ((myLocation.latitude - myRelativeLocation.latitude).abs() > 10.0 ||
+        (myRelativeLocation.longitude! - myRelativeLocation.longitude!).abs() >
+            10.0) {
       myRelativeLocation = myLocation;
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
   void downloadClosePosts() {
     print("DOWNLOAD POSTS");
-    setState(() async{   
-      posts = await PostRestService().getPosts(myLocation.latitude, myLocation.longitude);
+    setState(() async {
+      posts = await PostRestService()
+          .getPosts(myLocation.latitude, myLocation.longitude);
       createMarkers();
-     });
+    });
   }
 
   void updatePinOnMap(GoogleMapController controller) async {
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
 
     // do this inside the setState() so Flutter gets notified
     // that a widget update is due
-    setState((){
+    setState(() {
       // updated position
       var pinPosition = LatLng(myLocation.latitude, myLocation.longitude);
 
@@ -155,15 +155,12 @@ class _HomePageState extends State<HomePage> {
   void showPinsOnMap() {
     // get a LatLng for the source location
     // from the LocationData currentLocation object
-   
 
     //setInitMarkersPostsTEST();
     // destination pin
     // set the route lines on the map from source to destination
     // for more info follow this tutorial
   }
-
-  
 
   void setInitMarkersPostsTEST() async {
     var mess1 = LatLng(52.2606860, 20.9329840);
@@ -208,9 +205,9 @@ class _HomePageState extends State<HomePage> {
           // Kod obsługi naciśnięcia przycisku dla tego markera
           var distance = calculateDistance(myLocation.latitude,
               myLocation.longitude, mess1.latitude, mess1.longitude);
-              print("TEST DISTANCE: " + distance.toString());
+          print("TEST DISTANCE: " + distance.toString());
           if (distance < 10) {
-              print("OPEN MESSAGE");
+            print("OPEN MESSAGE");
           }
         }));
   }
@@ -229,7 +226,7 @@ class _HomePageState extends State<HomePage> {
           icon: BitmapDescriptor.fromBytes(
               distance < 10 ? messageOpenIcon : messageIcon),
           consumeTapEvents: true,
-          onTap: () {
+          onTap: () async{
             // Kod obsługi naciśnięcia przycisku dla tego markera
             if (distance < 10) {
               print("TEST DISTANCE: " + distance.toString());
@@ -237,37 +234,51 @@ class _HomePageState extends State<HomePage> {
               print(MarkerId(p.post_id).value);
 
               showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    content: Stack(
-                      //overflow: Overflow.visible,
-                      children: <Widget>[
-                        Positioned(
-                          right: -40.0,
-                          top: -40.0,
-                          child: InkResponse(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: CircleAvatar(
-                              radius: 12,
-                      child: Icon(Icons.close, size: 18,),
-                      backgroundColor: Colors.red,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                       title: Text(posts[i].title),
+                      content: Stack(
+                        //overflow: Overflow.visible,
+                        children: <Widget>[
+                          Positioned(
+                            right: -40.0,
+                            top: -40.0,
+                            child: InkResponse(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: CircleAvatar(
+                                radius: 12,
+                                child: Icon(
+                                  Icons.close,
+                                  size: 18,
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
                             ),
                           ),
-                        ),
-                        
-                      ],
-                    ),
-                  );
-                });
-          
+                         Container(
+        width: double.infinity,
+        
+         child:Column(mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(child:Text(posts[i].content)),
+            Flexible(child: ElevatedButton(onPressed: (){},
+            child: Text("Follow user")
+            )
+            ,)
+         ],)),
+                       
+                        ],
+                      ),
+                    );
+                  });
             }
           });
-     setState(() {   
-      markers[MarkerId(p.post_id)] = marker;
-     }); 
+      setState(() {
+        markers[MarkerId(p.post_id)] = marker;
+      });
     }
     print("CREATE MARKERS");
   }
@@ -331,7 +342,7 @@ class _HomePageState extends State<HomePage> {
       _mapStyle = string;
     });
     setMarkersIcon();
-    
+
     location.onLocationChanged.listen((LocationData cLoc) {
       // cLoc contains the lat and long of the
       // current user's position in real time,
@@ -341,7 +352,7 @@ class _HomePageState extends State<HomePage> {
     //checkLocationService();
     getCurrentLocation();
     //initPostsTEST();
-   
+
     print("INIT");
   }
 
@@ -350,8 +361,7 @@ class _HomePageState extends State<HomePage> {
     //await getCurrentLocation();
 
     print("BUILD");
-    if(posts.isNotEmpty)
-      print(posts[0].toJson());
+    if (posts.isNotEmpty) print(posts[0].toJson());
 
     return Scaffold(
       appBar: AppBar(

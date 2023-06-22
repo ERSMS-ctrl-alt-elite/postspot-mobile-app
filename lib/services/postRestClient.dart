@@ -9,8 +9,8 @@ class PostRestService {
   var token;
   var client = http.Client();
 
-  var hostName = "post-service-dev-svdlq5xita-lm.a.run.app";
-  var endpoint = "/posts";
+  var hostName = "postspot-api-gateway-eu-dev-a5mqnrt6.nw.gateway.dev";
+  var endpoint = "/v1/posts";
   Map<String, String> getQueryParameters = {};
 
   PostRestService() {
@@ -21,7 +21,8 @@ class PostRestService {
     final jsonData = post.toJson();
     try {
       return await client.post(Uri.https(hostName, endpoint),
-          headers: {'X-Forwarded-Authorization': 'Bearer $token'}, body: jsonData);
+          headers: {'X-Forwarded-Authorization': 'Bearer $token'},
+          body: jsonData);
     } finally {
       client.close();
     }
@@ -35,9 +36,10 @@ class PostRestService {
     try {
       print("TRY GET POSTS");
       var response = await client.get(
-          Uri.https(hostName, endpoint + "/"+  lang.toString() + "/" + lat.toString()),
+          Uri.https(hostName,
+              endpoint + "/" + lang.toString() + "/" + lat.toString()),
           headers: {'Authorization': 'Bearer $token'});
-      print(hostName+ endpoint + "/"+  lat.toString() + "/" + lang.toString());
+      print(hostName + endpoint + "/" + lat.toString() + "/" + lang.toString());
       print(response.body.toString());
       var decodedResponse = jsonDecode(response.body) as Map;
       print(decodedResponse);
@@ -58,12 +60,12 @@ class PostRestService {
   Future<Post> getPost(String id) async {
     Post post;
     try {
-      var response = await client.get(Uri.https(hostName, endpoint + id),
+      var response = await client.get(Uri.https(hostName, endpoint + "/"+id),
           headers: {'X-Forwarded-Authorization': 'Bearer $token'});
-
+      print(hostName+ endpoint + "/"+id);
       var p = jsonDecode(response.body) as Map;
       post = Post(p['post_id'], p['author_google_id'], p['title'], p['content'],
-          p['longtitude'], p['latitude']);
+          p['longitude'], p['latitude']);
     } finally {
       client.close();
     }
