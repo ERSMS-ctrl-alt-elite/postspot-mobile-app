@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
 
   final Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
+  Timer? _timer;
 
   Future<LocationData> getInitLocation() async {
     checkLocationService();
@@ -163,6 +164,27 @@ class _HomePageState extends State<HomePage> {
     // set the route lines on the map from source to destination
     // for more info follow this tutorial
   }
+
+  void startPostsTimer() {
+    int period = 10;
+    int time = 0;
+    _timer = Timer.periodic(const Duration(seconds: 1),
+      (Timer timer) {
+        if (time == 0) {
+          setState(() {
+            time = period;
+            downloadClosePosts();
+            createMarkers();
+          });
+        } else {
+          setState(() {
+            time--;
+          });
+        }
+      },
+    );
+  }
+
 
   void setInitMarkersPostsTEST() async {
     var mess1 = LatLng(52.2606860, 20.9329840);
@@ -450,8 +472,7 @@ class _HomePageState extends State<HomePage> {
                             _googleMapController.complete(controller);
                             controller.setMapStyle(_mapStyle);
                             updatePinOnMap(controller);
-                            downloadClosePosts();
-                            createMarkers();
+                            startPostsTimer();
                           });
                     }
                   })),
