@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   static var myLocation;
   static LocationData myRelativeLocation =
       LocationData.fromMap({"latitude": 0.0, "longitude": 0.0});
-  var location = new Location();
+  Location location = Location();
   PermissionStatus? _permissionGranted;
   static const double ZOOM = 18.5;
   String _mapStyle = '';
@@ -43,7 +43,16 @@ class _HomePageState extends State<HomePage> {
 
   final Completer<GoogleMapController> _googleMapController =
       Completer<GoogleMapController>();
+  GoogleMapController? googleMapController;
   Timer? _timer;
+  StreamSubscription<LocationData>? locationListener;
+  @override
+  void dispose() {
+    _timer?.cancel();
+    googleMapController?.dispose();
+    locationListener?.cancel();
+    super.dispose();
+  }
 
   Future<LocationData> getInitLocation() async {
     checkLocationService();
@@ -88,18 +97,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<LocationData> getCurrentLocation() async {
+    checkLocationService();
     print("GET CURRENT LOCATION");
-    Location location = Location();
-    location.getLocation().then(
-      (location) {
-        myLocation = location;
-      },
-    );
-    GoogleMapController googleMapController = await _googleMapController.future;
-    location.onLocationChanged.listen(
+    //Location location = Location();
+    //myLocation = await location.getLocation();
+    //_initialCameraPosition =
+    //   LatLng(myLocation.latitude!, myLocation.longitude!);
+
+    //location.getLocation().then(
+    //  (location) {
+    //    myLocation = location;
+    //  },
+    //);
+    googleMapController = await _googleMapController.future;
+    locationListener = location.onLocationChanged.listen(
       (newLoc) {
         myLocation = newLoc;
-        googleMapController.animateCamera(
+        googleMapController?.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(
               zoom: ZOOM,
@@ -117,7 +131,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool checkRelativeLocation() {
-    if ((myLocation.latitude - myRelativeLocation.latitude).abs() > 10.0 ||
+    if ((myLocation.latitude! - myRelativeLocation.latitude!).abs() > 10.0 ||
         (myRelativeLocation.longitude! - myRelativeLocation.longitude!).abs() >
             10.0) {
       myRelativeLocation = myLocation;
@@ -129,17 +143,18 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> downloadClosePostsAndUpdateMarks() async {
     print("DOWNLOAD POSTS");
-    List<Post>? res;
-    if (trackedUserId != null) {
-       res = await PostRestService()
-        .getPostsByauthor(trackedUserId!);
-    } else {
-      res = await PostRestService()
-        .getPosts(myLocation.latitude, myLocation.longitude);
-    }
-     
+    // List<Post>? res;
+    // if (trackedUserId != null) {
+    //    res = await PostRestService()
+    //     .getPostsByauthor(trackedUserId!);
+    // } else {
+    //   res = await PostRestService()
+    //     .getPosts(myLocation.latitude, myLocation.longitude);
+    // }
+    var res = await PostRestService()
+          .getPosts(myLocation.latitude, myLocation.longitude);
     setState(() {
-      posts = res!;
+      posts = res;    
       createMarkers();
     });
   }
@@ -150,7 +165,7 @@ class _HomePageState extends State<HomePage> {
     // follows the pin as it moves with an animation
     CameraPosition cPosition = CameraPosition(
       zoom: ZOOM,
-      target: LatLng(myLocation.latitude, myLocation.longitude),
+      target: LatLng(myLocation.latitude!, myLocation.longitude!),
     );
     controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
 
@@ -181,9 +196,9 @@ class _HomePageState extends State<HomePage> {
       const Duration(seconds: 1),
       (Timer timer) {
         if (time == 0) {
-          downloadClosePostsAndUpdateMarks();
           setState(() {
             time = timerPeriod;
+            downloadClosePostsAndUpdateMarks();
             //createMarkers();
           });
         } else {
